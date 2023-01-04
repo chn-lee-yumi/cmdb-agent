@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
+	"strings"
 )
 
 func execShell(command string) string {
@@ -29,5 +30,5 @@ func execShell(command string) string {
 		fmt.Println("Error: Wait error: ", err)
 		return ""
 	}
-	return string(bytes)
+	return strings.Trim(string(bytes), "\n")
 }

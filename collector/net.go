@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"runtime"
+	"strings"
 
 	pb "cmdb-agent/proto"
 )
@@ -39,7 +40,7 @@ func getMainIp() string {
 			break
 		}
 	}
-	return mainIp
+	return strings.Split(mainIp, "/")[0]
 }
 
 func getInterfaces() []*pb.Interface {

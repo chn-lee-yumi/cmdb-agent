@@ -10,10 +10,28 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/jpillora/overseer"
+	"github.com/jpillora/overseer/fetcher"
 )
 
 func main() {
-	conn, err := grpc.Dial("10.0.0.68:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// 自动更新
+	overseer.Run(overseer.Config{
+		Program: prog,
+		Fetcher: &fetcher.HTTP{
+			URL:      "http://download.gcc.ac.cn/cmdb-agent",
+			Interval: 1 * time.Minute,
+		},
+	})
+}
+
+// 真正的main
+func prog(state overseer.State) {
+	log.Printf("app (%s) running...", state.ID)
+
+	// 连接grpc
+	conn, err := grpc.Dial("cmdb.gcc.ac.cn:8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Connect error: %v", err)
 	}
@@ -31,9 +49,10 @@ func main() {
 		log.Println("uploading")
 		ack, err := c.Post(context.Background(), &p)
 		if err != nil {
-			panic(err)
+			log.Println(err)
+		} else {
+			log.Println("return code:", ack.Code)
 		}
-		log.Println("return code:", ack.Code)
 		// 等待下次采集
 		time.Sleep(nextExecTime.Sub(time.Now()))
 	}
