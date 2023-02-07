@@ -17,6 +17,8 @@ import (
 	"github.com/jpillora/overseer/fetcher"
 )
 
+const PERFORMANCE_TEST = false // 是否开启性能测试，如果是，则会一直循环采集发送，如果否，则一分钟采集一次
+
 var grpcServers = [...]string{"cmdb.gcc.ac.cn:8083", "cmdb.gcc.ac.cn:8084"} // grpc服务器列表，默认请求第一个，第一个连不上后会请求下一个
 
 func main() {
@@ -51,7 +53,9 @@ func prog(state overseer.State) {
 	nextExecTime := time.Now() //下次执行时间
 	for {
 		// 计算下次执行的时间
-		nextExecTime = nextExecTime.Add(time.Minute)
+		if !PERFORMANCE_TEST {
+			nextExecTime = nextExecTime.Add(time.Minute)
+		}
 		// 采集数据
 		log.Println("collecting")
 		p := collector.Collect()
@@ -74,6 +78,9 @@ func prog(state overseer.State) {
 			log.Println("upload failed, all servers down")
 		}
 		// 等待下次采集
-		time.Sleep(nextExecTime.Sub(time.Now()))
+		sleepTime := nextExecTime.Sub(time.Now())
+		if sleepTime > 0 {
+			time.Sleep(nextExecTime.Sub(time.Now()))
+		}
 	}
 }
