@@ -19,7 +19,8 @@ import (
 
 const PERFORMANCE_TEST = false // 是否开启性能测试，如果是，则会一直循环采集发送，如果否，则一分钟采集一次
 
-var grpcServers = [...]string{"cmdb.gcc.ac.cn:8083", "cmdb.gcc.ac.cn:8084"} // grpc服务器列表，默认请求第一个，第一个连不上后会请求下一个
+// var grpcServers = [...]string{"cmdb.gcc.ac.cn:8083", "cmdb.gcc.ac.cn:8084"} // grpc服务器列表，默认请求第一个，第一个连不上后会请求下一个
+var grpcServers = [...]string{"cmdb.gdutnic.com:8083", "cmdb.gdutnic.com:8084"}
 
 func main() {
 	// 自动更新
